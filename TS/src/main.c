@@ -48,13 +48,16 @@
 int main(void)
 {
 	int i = 0;
+	int k = 0;
+	uint8_t sens = 1;
 	char vie = '3';
 	uint8_t inp_clav;
 	uint8_t xv = 40;
 	uint8_t yv = 20;
 	uint8_t xa = 0;
 	uint8_t ya = 3;
-	uint8_t ym = 0;
+	uint8_t xm = 0;
+	uint8_t ym = 21;
 	char ship = 'o';
 	char missile = '^';
 	char alien = '#';
@@ -78,6 +81,7 @@ int main(void)
 	while (1)
 	{
 		i++;
+		k++;
 		vt100_move(37, 2);
 		serial_puts("SPACE INVADERS");
 		vt100_move(1, 2);
@@ -86,64 +90,113 @@ int main(void)
 		serial_puts("VIES: ");
 		vt100_move(75, 2);
 		serial_putchar(vie);
+		vt100_move(xv, 20);
+		serial_putchar(ship);
 		inp_clav = serial_get_last_char();
 
-		if (inp_clav == 'd') /*Si on appuie sur d = déplacement vers la droite*/
+		if (k == 20)
 		{
-			vt100_move(xv, 20);
+
+			vt100_move(xm, ym);
 			serial_putchar(' ');
-			xv += 1;
-			vt100_move(xv, 20);
-			serial_putchar(ship);
-		}
-		if (inp_clav == 'q') /*Si on appuie sur q = déplacement vers la gauche*/
-		{
-			vt100_move(xv, 20);
-			serial_putchar(' ');
-			xv -= 1;
-			vt100_move(xv, 20);
-			serial_putchar(ship);
-		}
-		if (inp_clav == 32)
-		{
-			while (ym <= 3)
+			ym -= 1;
+			vt100_move(xm, ym);
+			serial_putchar(missile);
+
+			if (ym == 3)
 			{
-				vt100_move(xv, ym);
-				serial_putchar(' ');
-				ym += 1;
-				vt100_move(xv, ym);
-				serial_putchar(missile);
+				ym = 21;
+			}
+			k = 0;
+		}
+
+
+		if (inp_clav == 'd')
+		{
+			vt100_move(xv, 20);
+			serial_putchar(' ');
+			if (xv != 80)
+			{
+				xv += 1;
+			}
+			vt100_move(xv, 20);
+			serial_putchar(ship);
+
+		}
+		if (inp_clav == 'q')
+		{
+			vt100_move(xv, 20);
+			serial_putchar(' ');
+			if (xv != 0)
+			{
+				xv -= 1;
+			}
+			vt100_move(xv, 20);
+			serial_putchar(ship);
+		}
+		/*-----------------------------------------------------
+			if (inp_clav == 'm')
+		{
+			while (ym != 3)
+			{
+
+				if (k > 1000000)
+				{
+					vt100_move(xv, ym);
+					serial_putchar(' ');
+					ym -= 1;
+					vt100_move(xv, ym);
+					serial_putchar(missile);
+					k = 0;
+				}
 			}
 			if (ym == 3)
 			{
-				vt100_move(xv, ym);
+				vt100_move(xm, 3);
 				serial_putchar(' ');
-
-				vt100_move(xv, 20);
-				serial_putchar(missile);
 			}
-
 		}
-		/*alien*/
-
-		vt100_move(xa, ya);
-		serial_putchar(' ');
-		xa += 1;
-		vt100_move(xa, ya);
-		serial_putchar(alien);
-
-		if (xa == 80)
+		 ---------alien------------------------------*/
+		if (i == 15)
 		{
-			vt100_move(xa, ya);
-			serial_putchar(' ');
-			xa = 0;
-			ya += 1;
-		}
-		if (ya > 20)
-		{
-			vt100_clear_screen();
-			vt100_move(39, 12);
-			serial_puts("LOSE !");
+			if (sens == 1)
+			{
+				vt100_move(xa, ya);
+				serial_putchar(' ');
+				xa += 1;
+				vt100_move(xa, ya);
+				serial_putchar(alien);
+				if (xa == 80)
+				{
+					vt100_move(xa, ya);
+					serial_putchar(' ');
+					ya += 1;
+					sens = 0;
+				}
+
+			}
+			if (sens == 0)
+			{
+				vt100_move(xa, ya);
+				serial_putchar(' ');
+				xa -= 1;
+				vt100_move(xa, ya);
+				serial_putchar(alien);
+				if (xa == 0)
+				{
+					vt100_move(xa, ya);
+					serial_putchar(' ');
+					ya += 1;
+					sens = 1;
+				}
+
+			}
+			if (ya == 20)
+			{
+				vt100_move(40, 20);
+				serial_puts("LOSE");
+			}
+			i = 0;
 		}
 
 	}
