@@ -27,24 +27,12 @@
  ******************************************************************************
  */
 
-/* Includes */
 #include "stm32f4xx.h"
 #include "stm32f4_discovery.h"
 #include "vt100.h"
 #include "serial.h"
 
-/* Private macro */
-/* Private variables */
-/* Private function prototypes */
-/* Private functions */
 
-/**
- **===========================================================================
- **
- **  Abstract: main program
- **
- **===========================================================================
- */
 int main(void)
 {
 	int i = 0;
@@ -56,7 +44,7 @@ int main(void)
 	uint8_t yv = 20;
 	uint8_t xa = 0;
 	uint8_t ya = 3;
-	uint8_t xm = 0;
+	uint8_t xm = 40;
 	uint8_t ym = 21;
 	char ship = 'o';
 	char missile = '^';
@@ -70,6 +58,8 @@ int main(void)
 	serial_puts("SPACE INVADERS");
 	vt100_move(34, 4);
 	serial_puts("by Alexandre OLIVIER");
+	vt100_move(20, 10);
+	serial_puts("Q = Gauche / Espace = Missile / D = Droite");
 	vt100_move(33, 20);
 	serial_puts("Press <SPACE> to start");
 
@@ -94,9 +84,8 @@ int main(void)
 		serial_putchar(ship);
 		inp_clav = serial_get_last_char();
 
-		if (k == 20)
+		if (k == 20 || inp_clav == 32)
 		{
-
 			vt100_move(xm, ym);
 			serial_putchar(' ');
 			ym -= 1;
@@ -105,6 +94,9 @@ int main(void)
 
 			if (ym == 3)
 			{
+				vt100_move(xm, 3);
+				serial_putchar(' ');
+				xm = xv;
 				ym = 21;
 			}
 			k = 0;
