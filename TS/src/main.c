@@ -31,14 +31,19 @@
 #include "stm32f4_discovery.h"
 #include "vt100.h"
 #include "serial.h"
-
+#include "stdint.h"
 
 int main(void)
 {
 	int i = 0;
 	int k = 0;
+	int j = 0;
 	uint8_t sens = 1;
-	char vie = '3';
+	char b = 51;
+	uint8_t vie = b;
+	char a = 48;
+	uint8_t score = a;
+
 	uint8_t inp_clav;
 	uint8_t xv = 40;
 	uint8_t yv = 20;
@@ -46,9 +51,12 @@ int main(void)
 	uint8_t ya = 3;
 	uint8_t xm = 40;
 	uint8_t ym = 21;
+	uint8_t xb = 0;
+	uint8_t yb = 4;
 	char ship = 'o';
 	char missile = '^';
 	char alien = '#';
+	char bombs = '*';
 
 	serial_init(115200);
 	vt100_clear_screen();
@@ -72,10 +80,13 @@ int main(void)
 	{
 		i++;
 		k++;
+		j++;
 		vt100_move(37, 2);
 		serial_puts("SPACE INVADERS");
-		vt100_move(1, 2);
+		vt100_move(2, 2);
 		serial_puts("SCORE: ");
+		vt100_move(13, 2);
+		serial_putchar(score);
 		vt100_move(65, 2);
 		serial_puts("VIES: ");
 		vt100_move(75, 2);
@@ -83,6 +94,29 @@ int main(void)
 		vt100_move(xv, 20);
 		serial_putchar(ship);
 		inp_clav = serial_get_last_char();
+
+		/*if (inp_clav == 'm')
+		{
+			for (z = 0; z < 18; z++)
+			{
+				vt100_move(xm, ym);
+				serial_putchar(' ');
+				ym -= 1;
+				vt100_move(xm, ym);
+				serial_putchar(missile);
+
+				if (ym == 3)
+				{
+					vt100_move(xm, 3);
+					serial_putchar(' ');
+					xm = xv;
+					ym = 21;
+				}
+
+			}
+
+		 }*/
+
 
 		if (k == 20 || inp_clav == 32)
 		{
@@ -102,54 +136,33 @@ int main(void)
 			k = 0;
 		}
 
-
+		/*--Deplacement joueur--*/
 		if (inp_clav == 'd')
 		{
-			vt100_move(xv, 20);
+			vt100_move(xv, yv);
 			serial_putchar(' ');
 			if (xv != 80)
 			{
 				xv += 1;
 			}
-			vt100_move(xv, 20);
+			vt100_move(xv, yv);
 			serial_putchar(ship);
 
 		}
 		if (inp_clav == 'q')
 		{
-			vt100_move(xv, 20);
+			vt100_move(xv, yv);
 			serial_putchar(' ');
 			if (xv != 0)
 			{
 				xv -= 1;
 			}
-			vt100_move(xv, 20);
+			vt100_move(xv, yv);
 			serial_putchar(ship);
 		}
-		/*-----------------------------------------------------
-			if (inp_clav == 'm')
-		{
-			while (ym != 3)
-			{
 
-				if (k > 1000000)
-				{
-					vt100_move(xv, ym);
-					serial_putchar(' ');
-					ym -= 1;
-					vt100_move(xv, ym);
-					serial_putchar(missile);
-					k = 0;
-				}
-			}
-			if (ym == 3)
-			{
-				vt100_move(xm, 3);
-				serial_putchar(' ');
-			}
-		}
-		 ---------alien------------------------------*/
-		if (i == 15)
+		/*--alien--*/
+		if (i == 30)
 		{
 			if (sens == 1)
 			{
@@ -183,6 +196,7 @@ int main(void)
 				}
 
 			}
+
 			if (ya == 20)
 			{
 				vt100_move(40, 20);
@@ -191,9 +205,66 @@ int main(void)
 			i = 0;
 		}
 
-	}
-}
+		/*--Gestion bombes alien--*/
+		if (j == 30)
+		{
+			vt100_move(xb, yb);
+			serial_putchar(' ');
+			yb += 1;
+			vt100_move(xb, yb);
+			serial_putchar(bombs);
 
+			if (yb == 23)
+			{
+				vt100_move(xb, 23);
+				serial_putchar(' ');
+				xb = xa;
+				yb = ya;
+			}
+			j = 0;
+		}
+
+		/*Gestion score*/
+		if (xm == xa && ym == ya)
+		{
+			score = score + 1;
+			vt100_move(xa, ya);
+			serial_putchar(' ');
+			vt100_move(10, 1);
+			serial_puts("Alien KO");
+
+		}
+		if (xb == xv && yb == yv)
+		{
+			vie = vie - 1;
+			xb = xa;
+			yb = ya;
+		}
+		while (vie != 48)
+		{
+			vt100_clear_screen();
+			vt100_move(37, 2);
+			serial_puts("SPACE INVADERS");
+			vt100_move(2, 2);
+			serial_puts("SCORE: ");
+			vt100_move(13, 2);
+			serial_putchar(score);
+			vt100_move(40, 20);
+			serial_puts("LOSE");
+		}
+
+		if (xm == xb && ym == yb)
+		{
+			vt100_move(xm, ym);
+			serial_putchar(' ');
+			xm = xv;
+			ym = 21;
+			xb = xa;
+			yb = ya;
+		}
+	}
+
+}
 /*
  * Callback used by stm32f4_discovery_audio_codec.c.
  * Refer to stm32f4_discovery_audio_codec.h for more info.
