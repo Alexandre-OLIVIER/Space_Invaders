@@ -60,7 +60,7 @@ int main(void)
 		serial_puts("SCORE: ");
 		vt100_move(13, 2);
 		serial_putchar(score);
-		vt100_move(65, 2);
+		vt100_move(70, 2);
 		serial_puts("VIES: ");
 		vt100_move(75, 2);
 		serial_putchar(vie);
@@ -69,14 +69,34 @@ int main(void)
 		inp_clav = serial_get_last_char();
 
 		if (inp_clav == 'm')
-		 {
-		 for (z = 0; z < 18; z++)
-		 {
+		{
+			for (z = 0; z < 18; z++)
+			{
 				vt100_move(xm, ym);
 				serial_putchar(' ');
 				ym -= 1;
 				vt100_move(xm, ym);
 				serial_putchar(missile);
+
+				if (ym == 3)
+				{
+					vt100_move(xm, 3);
+					serial_putchar(' ');
+					xm = xv;
+					ym = 21;
+				}
+
+			}
+
+		}
+
+		/*if (k == 20 || inp_clav == 32)
+		 {
+		 vt100_move(xm, ym);
+		 serial_putchar(' ');
+		 ym -= 1;
+		 vt100_move(xm, ym);
+		 serial_putchar(missile);
 
 		 if (ym == 3)
 		 {
@@ -85,27 +105,7 @@ int main(void)
 		 xm = xv;
 		 ym = 21;
 		 }
-
-		 }
-
-		}
-
-		/*if (k == 20 || inp_clav == 32)
-		{
-			vt100_move(xm, ym);
-			serial_putchar(' ');
-			ym -= 1;
-			vt100_move(xm, ym);
-			serial_putchar(missile);
-
-			if (ym == 3)
-			{
-				vt100_move(xm, 3);
-				serial_putchar(' ');
-				xm = xv;
-				ym = 21;
-			}
-			k = 0;
+		 k = 0;
 		 }*/
 
 		/*--Deplacement joueur--*/
