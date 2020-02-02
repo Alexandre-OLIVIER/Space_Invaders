@@ -23,12 +23,18 @@ int main(void)
 	uint8_t alive[30] =
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 			1, 1, 1, 1, 1 };
+	/*Variables bombes*/
+	uint8_t random = 0;
+	uint8_t nbomb = 0;
+	uint8_t xb[20] =
+	{ 0 };
+	uint8_t yb[20] =
+	{ 0 };
 
 	char b = 51;
 	uint8_t vie = b;
-	char a = 48;
-	uint8_t score = a;
-
+	uint8_t score = 0;
+	uint8_t statut_game = 1; //1 = en cours, 0 = perdu, 2 = gagné
 	uint8_t inp_clav;
 	uint8_t xv = 40;
 	uint8_t yv = 20;
@@ -36,8 +42,6 @@ int main(void)
 	uint8_t missile_lance = 0;
 	uint8_t xm = 40;
 	uint8_t ym = 21;
-	uint8_t xb = 0;
-	uint8_t yb = 4;
 	char ship = 'o';
 	char missile = '^';
 	char alien = '#';
@@ -65,27 +69,34 @@ int main(void)
 	/*Init alien*/
 	for (va = 0; va < 10; va++)
 	{
-		ya[va] = 3;
+		ya[va] = 4;
 		vt100_move(xa[va], ya[va]);
 		serial_putchar(alien);
 		xa[va] = va * 3;
 	}
 	for (va = 10; va < 20; va++)
 	{
-		ya[va] = 5;
+		ya[va] = 6;
 		vt100_move(xa[va], ya[va]);
 		serial_putchar(alien);
 		xa[va] = (va - 10) * 3;
 	}
 	for (va = 20; va < 30; va++)
 	{
-		ya[va] = 7;
+		ya[va] = 8;
 		vt100_move(xa[va], ya[va]);
 		serial_putchar(alien);
 		xa[va] = (va - 20) * 3;
 	}
+	/*Init bombes*/
+	for (nbomb = 0; nbomb < 20; nbomb++)
+	{
+		random = rand() % 30;
+		xb[nbomb] = xa[random];
+		yb[nbomb] = ya[random];
+	}
 
-	while (vie != 48)
+	while (statut_game == 1)
 	{
 		i++;
 		k++;
@@ -112,6 +123,7 @@ int main(void)
 		if (missile_lance == 1)
 		{
 			h++;
+
 			if (ym != 3 && h == 20)
 			{
 				vt100_move(xm, ym);
@@ -206,6 +218,7 @@ int main(void)
 					if (ya[va] == 20)
 					{
 						vie = 48;
+						statut_game = 0;
 					}
 					i = 0;
 				}
@@ -214,25 +227,34 @@ int main(void)
 
 		}
 
-		/*--Gestion bombes alien--
-		 if (j == 30)
-		 {
-		 vt100_move(xb, yb);
-		 serial_putchar(' ');
-		 yb += 1;
-		 vt100_move(xb, yb);
-		 serial_putchar(bombs);
+		/*--Gestion bombes alien--*/
 
-		 if (yb == 23)
-		 {
-		 vt100_move(xb, 23);
-		 serial_putchar(' ');
-		 xb = xa;
-		 yb = ya;
-		 }
-		 j = 0;
-		 }
-		 */
+		if (j == 30)
+		{
+			for (nbomb = 0; nbomb < 20; nbomb++)
+			{
+				random = rand() % 30;
+				if (alive[random] != 0)
+				{
+					vt100_move(xb[nbomb], yb[nbomb]);
+					serial_putchar(' ');
+					yb[nbomb] += 1;
+					vt100_move(xb[nbomb], yb[nbomb]);
+					serial_putchar(bombs);
+
+					if (yb[nbomb] == 23)
+					{
+						vt100_move(xb[nbomb], 23);
+						serial_putchar(' ');
+						xb[nbomb] = xa[random];
+						yb[nbomb] = ya[random];
+					}
+					j = 0;
+				}
+
+			}
+
+		}
 
 		/*Gestion score*/
 		for (va = 0; va < 30; va++)
@@ -246,45 +268,73 @@ int main(void)
 				ym = 21;
 				xm = xv;
 				missile_lance = 0;
-				xa[va] = 2;
-				ya[va] = 23;
-				vt100_move(xa[va], ya[va]);
-				serial_putchar(alien);
+				xa[va] = 0;
+				ya[va] = 24;
+				//vt100_move(xa[va], ya[va]);
+				//serial_putchar(alien);
 				vt100_move(10, 1);
 				serial_puts("Alien KO");
 			}
 
 		}
 
-		/*-Gestion vie-
-		 if (xb == xv && yb == yv)
-		 {
-		 vie = vie - 1;
-		 xb = xa;
-		 yb = ya;
-		 }
-		 /*Collision missile - bombe
-		 if (xm == xb && ym == yb)
-		 {
-		 vt100_move(xm, ym);
-		 serial_putchar(' ');
-		 xm = xv;
-		 ym = 21;
-		 xb = xa;
-		 yb = ya;
-		 }*/
+
+		if (score == 30)
+		{
+			statut_game = 2;
+		}
+		/*-Gestion vie-*/
+		for (nbomb = 0; nbomb < 20; nbomb++)
+		{
+			random = rand() % 30;
+			if (alive[random] != 0)
+			{
+				if (xb[nbomb] == xv && yb[nbomb] == yv)
+				{
+					vie = vie - 1;
+					xb[nbomb] = xa[random];
+					yb[nbomb] = ya[random];
+					if (vie == 48)
+					{
+						statut_game = 0;
+					}
+				}
+				/*Collision missile - bombe*/
+				if (xm == xb[nbomb] && ym == yb[nbomb])
+				{
+					missile_lance = 0;
+					vt100_move(xm, ym);
+					serial_putchar(' ');
+					xm = xv;
+					ym = 21;
+					xb[nbomb] = xa[random];
+					yb[nbomb] = ya[random];
+				}
+			}
+		}
 	}
 	vt100_clear_screen();
-	while (inp_clav != 32)
+	while (statut_game == 0)
 	{
 		vt100_move(37, 2);
 		serial_puts("SPACE INVADERS");
 		vt100_move(2, 2);
 		serial_puts("SCORE: ");
 		vt100_move(13, 2);
-		serial_putchar(score);
+		//serial_putchar(score);
 		vt100_move(40, 10);
-		serial_puts("LOSE");
+		serial_puts("LOSE!");
+	}
+	while (statut_game == 2)
+	{
+		vt100_move(37, 2);
+		serial_puts("SPACE INVADERS");
+		vt100_move(2, 2);
+		serial_puts("SCORE: ");
+		vt100_move(13, 2);
+		//serial_putchar(score);
+		vt100_move(40, 10);
+		serial_puts("WIN!");
 	}
 
 }
