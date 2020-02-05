@@ -26,9 +26,9 @@ int main(void)
 	/*Variables bombes*/
 	uint8_t random = 0;
 	uint8_t nbomb = 0;
-	uint8_t xb[20] =
+	uint8_t xb[15] =
 	{ 0 };
-	uint8_t yb[20] =
+	uint8_t yb[15] =
 	{ 0 };
 
 	char b = 51;
@@ -65,7 +65,12 @@ int main(void)
 		inp_clav = serial_get_last_char();
 	}
 	vt100_clear_screen();
-
+	vt100_move(37, 2);
+	serial_puts("SPACE INVADERS");
+	vt100_move(2, 2);
+	serial_puts("SCORE: ");
+	vt100_move(70, 2);
+	serial_puts("VIES: ");
 	/*Init alien*/
 	for (va = 0; va < 10; va++)
 	{
@@ -101,14 +106,8 @@ int main(void)
 		i++;
 		k++;
 		j++;
-		vt100_move(37, 2);
-		serial_puts("SPACE INVADERS");
-		vt100_move(2, 2);
-		serial_puts("SCORE: ");
 		vt100_move(13, 2);
 		serial_putchar(score);
-		vt100_move(70, 2);
-		serial_puts("VIES: ");
 		vt100_move(75, 2);
 		serial_putchar(vie);
 		vt100_move(xv, 20);
@@ -191,7 +190,7 @@ int main(void)
 						xa[va] += 1;
 						vt100_move(xa[va], ya[va]);
 						serial_putchar(alien);
-						if (xa[va] == 80)
+						if (xa[va] == 81)
 						{
 							vt100_move(xa[va], ya[va]);
 							serial_putchar(' ');
@@ -231,7 +230,7 @@ int main(void)
 
 		if (j == 30)
 		{
-			for (nbomb = 0; nbomb < 20; nbomb++)
+			for (nbomb = 0; nbomb < 15; nbomb++)
 			{
 				random = rand() % 30;
 				if (alive[random] != 0)
@@ -284,7 +283,7 @@ int main(void)
 			statut_game = 2;
 		}
 		/*-Gestion vie-*/
-		for (nbomb = 0; nbomb < 20; nbomb++)
+		for (nbomb = 0; nbomb < 15; nbomb++)
 		{
 			random = rand() % 30;
 			if (alive[random] != 0)
