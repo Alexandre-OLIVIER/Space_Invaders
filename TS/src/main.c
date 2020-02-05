@@ -26,9 +26,9 @@ int main(void)
 	/*Variables bombes*/
 	uint8_t random = 0;
 	uint8_t nbomb = 0;
-	uint8_t xb[15] =
+	uint8_t xb[20] =
 	{ 0 };
-	uint8_t yb[15] =
+	uint8_t yb[20] =
 	{ 0 };
 
 	char b = 51;
@@ -69,8 +69,13 @@ int main(void)
 	serial_puts("SPACE INVADERS");
 	vt100_move(2, 2);
 	serial_puts("SCORE: ");
+	vt100_move(13, 2);
+	serial_puts("000");
 	vt100_move(70, 2);
 	serial_puts("VIES: ");
+	vt100_move(75, 2);
+	serial_putchar(vie);
+
 	/*Init alien*/
 	for (va = 0; va < 10; va++)
 	{
@@ -106,10 +111,7 @@ int main(void)
 		i++;
 		k++;
 		j++;
-		vt100_move(13, 2);
-		serial_putchar(score);
-		vt100_move(75, 2);
-		serial_putchar(vie);
+
 		vt100_move(xv, 20);
 		serial_putchar(ship);
 		inp_clav = serial_get_last_char();
@@ -190,7 +192,7 @@ int main(void)
 						xa[va] += 1;
 						vt100_move(xa[va], ya[va]);
 						serial_putchar(alien);
-						if (xa[va] == 81)
+						if (xa[va] == 80)
 						{
 							vt100_move(xa[va], ya[va]);
 							serial_putchar(' ');
@@ -212,7 +214,6 @@ int main(void)
 							ya[va] += 1;
 							sens[va] = 1;
 						}
-
 					}
 					if (ya[va] == 20)
 					{
@@ -221,16 +222,14 @@ int main(void)
 					}
 					i = 0;
 				}
-
 			}
-
 		}
 
 		/*--Gestion bombes alien--*/
 
 		if (j == 30)
 		{
-			for (nbomb = 0; nbomb < 15; nbomb++)
+			for (nbomb = 0; nbomb < 20; nbomb++)
 			{
 				random = rand() % 30;
 				if (alive[random] != 0)
@@ -250,9 +249,7 @@ int main(void)
 					}
 					j = 0;
 				}
-
 			}
-
 		}
 
 		/*Gestion score*/
@@ -273,17 +270,17 @@ int main(void)
 				//serial_putchar(alien);
 				vt100_move(10, 1);
 				serial_puts("Alien KO");
+				vt100_move(13, 2);
+				serial_putchar(score);
 			}
-
 		}
-
 
 		if (score == 30)
 		{
 			statut_game = 2;
 		}
 		/*-Gestion vie-*/
-		for (nbomb = 0; nbomb < 15; nbomb++)
+		for (nbomb = 0; nbomb < 20; nbomb++)
 		{
 			random = rand() % 30;
 			if (alive[random] != 0)
@@ -291,6 +288,8 @@ int main(void)
 				if (xb[nbomb] == xv && yb[nbomb] == yv)
 				{
 					vie = vie - 1;
+					vt100_move(75, 2);
+					serial_putchar(vie);
 					xb[nbomb] = xa[random];
 					yb[nbomb] = ya[random];
 					if (vie == 48)
