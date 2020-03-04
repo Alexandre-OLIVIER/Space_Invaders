@@ -7,6 +7,9 @@
 #include "Menu_init.h"
 
 #define origine_ym (21)
+#define nb_aliens (21)
+#define nb_bombs (2)
+#define nb_bunkers (18)
 
 /*Structure*/
 typedef struct
@@ -39,13 +42,13 @@ int main(void)
 
 	/*Variables alien*/
 	uint8_t va = 0;
-	alien aliens[30] =
+	alien aliens[nb_aliens] =
 	{ 0 };
 
 	/*Variables bombes*/
 	uint8_t random = 0;
 	uint8_t nbomb = 0;
-	bomb bombs[10] =
+	bomb bombs[nb_bombs] =
 	{ 0 };
 
 	char b = 51;
@@ -54,7 +57,7 @@ int main(void)
 	uint8_t statut_game = 1; //1 = en cours, 0 = perdu, 2 = gagné
 	uint8_t inp_clav;
 	uint8_t xv = 40;
-	uint8_t yv = 20;
+	const uint8_t yv = 20;
 
 	/*Variables missiles*/
 	uint8_t missile_lance = 0;
@@ -67,7 +70,7 @@ int main(void)
 
 	/*Variables bunker*/
 	uint8_t nbk = 0;
-	bunker bunkers[27];
+	bunker bunkers[nb_bunkers];
 	char bunker_item = '=';
 
 	int rand(void);
@@ -78,28 +81,28 @@ int main(void)
 	menu_init(vie);
 
 	/*Init alien*/
-	for (va = 0; va < 10; va++)
+	for (va = 0; va < nb_aliens / 3; va++)
 	{
 		aliens[va].ya = 4;
 		aliens[va].xa = va * 3;
 		aliens[va].alive = 1;
 		aliens[va].direction = 1;
 	}
-	for (va = 10; va < 20; va++)
+	for (va = nb_aliens / 3; va < 2 * (nb_aliens / 3); va++)
 	{
 		aliens[va].ya = 6;
-		aliens[va].xa = (va - 10) * 3;
+		aliens[va].xa = (va - 7) * 3;
 		aliens[va].alive = 1;
 		aliens[va].direction = 1;
 	}
-	for (va = 20; va < 30; va++)
+	for (va = 2 * (nb_aliens / 3); va < nb_aliens; va++)
 	{
 		aliens[va].ya = 8;
-		aliens[va].xa = (va - 20) * 3;
+		aliens[va].xa = (va - 14) * 3;
 		aliens[va].alive = 1;
 		aliens[va].direction = 1;
 	}
-	for (va = 0; va < 30; va++)
+	for (va = 0; va < nb_aliens; va++)
 	{
 		vt100_move(aliens[va].xa, aliens[va].ya);
 		serial_putchar(alien);
@@ -139,10 +142,17 @@ int main(void)
 		bunkers[nbk].xbk = (nbk - 3) + 42;
 	}
 
-	for (nbk = 0; nbk < 18; nbk++)
+	for (nbk = 0; nbk < nb_bunkers; nbk++)
 	{
 		vt100_move(bunkers[nbk].xbk, bunkers[nbk].ybk);
 		serial_putchar(bunker_item);
+	}
+
+	for (nbomb = 0; nbomb < nb_bombs; nbomb++)
+	{
+		random = rand() % nb_aliens;
+		bombs[nbomb].xb = aliens[random].xa;
+		bombs[nbomb].yb = aliens[random].ya;
 	}
 	/*Init bunker*/
 	//init_bunker();
@@ -218,9 +228,9 @@ int main(void)
 		}
 
 		/*-----Déplacement alien-----*/
-		if (i == 100)
+		if (i == 150)
 		{
-			for (va = 0; va < 30; va++)
+			for (va = 0; va < nb_aliens; va++)
 			{
 				if (aliens[va].alive == 1)
 				{
@@ -230,12 +240,8 @@ int main(void)
 					if (aliens[va].direction == 1)
 					{
 						aliens[va].xa += 1;
-						vt100_move(aliens[va].xa, aliens[va].ya);
-						serial_putchar(alien);
 						if (aliens[va].xa == 81)
 						{
-							vt100_move(aliens[va].xa, aliens[va].ya);
-							serial_putchar(' ');
 							aliens[va].ya += 1;
 							aliens[va].direction = 0;
 						}
@@ -243,16 +249,15 @@ int main(void)
 					if (aliens[va].direction == 0)
 					{
 						aliens[va].xa -= 1;
-						vt100_move(aliens[va].xa, aliens[va].ya);
-						serial_putchar(alien);
 						if (aliens[va].xa == 0)
 						{
-							vt100_move(aliens[va].xa, aliens[va].ya);
-							serial_putchar(' ');
 							aliens[va].ya += 1;
 							aliens[va].direction = 1;
 						}
 					}
+					vt100_move(aliens[va].xa, aliens[va].ya);
+					serial_putchar(alien);
+
 					if (aliens[va].ya == 20)
 					{
 						statut_game = 0;
@@ -263,34 +268,35 @@ int main(void)
 		}
 
 		/*--Gestion bombes alien--*/
-		if (j == 150)
+		if (j == 200)
 		{
-			for (nbomb = 0; nbomb < 10; nbomb++)
+			for (nbomb = 0; nbomb < nb_bombs; nbomb++)
 			{
-				random = rand() % 30;
-				if (aliens[random].alive == 1)
+				vt100_move(bombs[nbomb].xb, bombs[nbomb].yb);
+				serial_putchar(' ');
+				bombs[nbomb].yb += 1;
+				vt100_move(bombs[nbomb].xb, bombs[nbomb].yb);
+				serial_putchar(bomb);
+
+				if (bombs[nbomb].yb == 23)
 				{
-					vt100_move(bombs[nbomb].xb, bombs[nbomb].yb);
+					vt100_move(bombs[nbomb].xb, 23);
 					serial_putchar(' ');
-					bombs[nbomb].yb += 1;
-					vt100_move(bombs[nbomb].xb, bombs[nbomb].yb);
-					serial_putchar(bomb);
-
-					if (bombs[nbomb].yb == 23)
+					random = rand() % nb_aliens;
+					while (aliens[random].alive == 0)
 					{
-						vt100_move(bombs[nbomb].xb, 23);
-						serial_putchar(' ');
-						bombs[nbomb].xb = aliens[random].xa;
-						bombs[nbomb].yb = aliens[random].ya;
-
+						random = rand() % nb_aliens;
 					}
-					j = 0;
+					bombs[nbomb].xb = aliens[random].xa;
+					bombs[nbomb].yb = aliens[random].ya;
 				}
+				j = 0;
+
 			}
 		}
 
 		/*Gestion score*/
-		for (va = 0; va < 30; va++)
+		for (va = 0; va < nb_aliens; va++)
 		{
 			if (xm == aliens[va].xa && ym == aliens[va].ya)
 			{
@@ -305,21 +311,21 @@ int main(void)
 				aliens[va].ya = 24;
 				vt100_move(10, 1);
 				serial_puts("Alien KO");
-				vt100_move(13, 2);
-				serial_putchar(score);
+				//vt100_move(13, 2);
+				//serial_putchar(score);
 			}
 		}
-		if (score == 30)
+		if (score == nb_aliens)
 		{
 			statut_game = 2;
 		}
 		/*Collision bunker missile-----------------------------------------------------------------*/
-		for (nbk = 0; nbk < 18; nbk++)
+		for (nbk = 0; nbk < nb_bunkers; nbk++)
 		{
 			if (bunkers[nbk].xbk == xm && bunkers[nbk].ybk == ym)
 			{
-				vt100_move(20, 22);
-				serial_puts("OK");
+				//vt100_move(20, 22);
+				//serial_puts("OK");
 				vt100_move(bunkers[nbk].xbk, bunkers[nbk].ybk);
 				serial_putchar(' ');
 				bunkers[nbk].xbk = 80;
@@ -330,7 +336,7 @@ int main(void)
 				xm = xv;
 				ym = origine_ym;
 			}
-			for (nbomb = 0; nbomb < 10; nbomb++)
+			for (nbomb = 0; nbomb < nb_bombs; nbomb++)
 			{
 				if (bunkers[nbk].xbk == bombs[nbomb].xb
 						&& bunkers[nbk].ybk == bombs[nbomb].yb)
@@ -350,9 +356,9 @@ int main(void)
 		}
 
 		/*-Gestion vie-*/
-		for (nbomb = 0; nbomb < 10; nbomb++)
+		for (nbomb = 0; nbomb < nb_bombs; nbomb++)
 		{
-			random = rand() % 30;
+			random = rand() % nb_aliens;
 			if (aliens[random].alive == 1)
 			{
 				if (bombs[nbomb].xb == xv && bombs[nbomb].yb == yv)
