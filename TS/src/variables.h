@@ -6,7 +6,6 @@
 #define nb_bombs (2)
 #define nb_bunkers (18)
 
-
 typedef struct
 {
 	uint8_t xa;

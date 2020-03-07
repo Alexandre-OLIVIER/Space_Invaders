@@ -18,6 +18,7 @@ int main(void)
 
 	/*Variables alien*/
 	uint8_t va = 0;
+	uint8_t vitesse_alien = 150;
 	struct_alien aliens[nb_aliens] =
 	{ 0 };
 	struct_alien *ptralien = aliens;
@@ -26,6 +27,7 @@ int main(void)
 	/*Variables bombes*/
 	uint8_t random = 0;
 	uint8_t nbomb = 0;
+	uint8_t vitesse_bomb = 200;
 	struct_bomb bombs[nb_bombs] =
 	{ 0 };
 
@@ -79,6 +81,9 @@ int main(void)
 		bombs[nbomb].xb = ptralien[random].xa;
 		bombs[nbomb].yb = ptralien[random].ya;
 	}
+	extern char mode;
+	vt100_move(23, 20);
+	serial_putchar(mode);
 
 	/*Partie en cours*/
 	while (statut_game == 1)
@@ -86,6 +91,22 @@ int main(void)
 		i++;
 		k++;
 		j++;
+
+		if (mode ==49)
+		{
+			vitesse_alien = 200;
+			vitesse_bomb = 250;
+		}
+		if (mode == 50)
+		{
+			vitesse_alien = 150;
+			vitesse_bomb = 200;
+		}
+		if (mode == 51)
+		{
+			vitesse_alien = 100;
+			vitesse_bomb = 150;
+		}
 
 		vt100_move(xv, 20);
 		serial_putchar(ship);
@@ -151,7 +172,7 @@ int main(void)
 		}
 
 		/*-----Déplacement alien-----*/
-		if (i == 150)
+		if (i == vitesse_alien)
 		{
 			for (va = 0; va < nb_aliens; va++)
 			{
@@ -191,7 +212,7 @@ int main(void)
 		}
 
 		/*--Gestion bombes alien--*/
-		if (j == 200)
+		if (j == vitesse_bomb)
 		{
 			for (nbomb = 0; nbomb < nb_bombs; nbomb++)
 			{
