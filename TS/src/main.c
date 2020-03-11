@@ -7,6 +7,7 @@
 #include "stdint.h"
 #include "variables.h"
 #include "Menu_init.h"
+#include <stdio.h>
 
 int main(void)
 {
@@ -56,6 +57,8 @@ int main(void)
 	char bomb_item = '*';
 	char bunker_item = '=';
 
+	char display_score[2];
+
 	int rand(void);
 
 	serial_init(115200);
@@ -82,8 +85,8 @@ int main(void)
 		bombs[nbomb].yb = ptralien[random].ya;
 	}
 	extern char mode;
-	vt100_move(23, 20);
-	serial_putchar(mode);
+	//vt100_move(23, 20);
+	//serial_putchar(mode);
 
 	/*Partie en cours*/
 	while (statut_game == 1)
@@ -91,6 +94,9 @@ int main(void)
 		i++;
 		k++;
 		j++;
+
+		sprintf(display_score, "%d", score);
+
 
 		if (mode ==49)
 		{
@@ -120,7 +126,7 @@ int main(void)
 		if (missile_lance == 1)
 		{
 			h++;
-			if (ym != 3 && h == 60)
+			if (ym != 3 && h == 80)
 			{
 				vt100_move(xm, ym);
 				serial_putchar(' ');
@@ -253,10 +259,10 @@ int main(void)
 				missile_lance = 0;
 				ptralien[va].xa = 0;
 				ptralien[va].ya = 24;
-				vt100_move(10, 1);
-				serial_puts("Alien KO");
-				//vt100_move(13, 2);
-				//serial_putchar(score);
+				//vt100_move(10, 1);
+				//serial_puts("Alien KO");
+				vt100_move(10, 2);
+				serial_puts(display_score);
 			}
 		}
 		if (score == nb_aliens)
@@ -268,8 +274,6 @@ int main(void)
 		{
 			if (ptrbk[nbk].xbk == xm && ptrbk[nbk].ybk == ym)
 			{
-				//vt100_move(20, 22);
-				//serial_puts("OK");
 				vt100_move(ptrbk[nbk].xbk, ptrbk[nbk].ybk);
 				serial_putchar(' ');
 				ptrbk[nbk].xbk = 80;
@@ -338,6 +342,8 @@ int main(void)
 		serial_puts("SPACE INVADERS");
 		vt100_move(2, 2);
 		serial_puts("SCORE: ");
+		vt100_move(10, 2);
+		serial_puts(display_score);
 		vt100_move(40, 10);
 		serial_puts("LOSE!");
 	}
@@ -347,6 +353,8 @@ int main(void)
 		serial_puts("SPACE INVADERS");
 		vt100_move(2, 2);
 		serial_puts("SCORE: ");
+		vt100_move(10, 2);
+		serial_puts(display_score);
 		vt100_move(40, 10);
 		serial_puts("WIN!");
 	}

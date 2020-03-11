@@ -57,8 +57,8 @@ void menu_init(uint8_t vie)
 	serial_puts("SPACE INVADERS");
 	vt100_move(2, 2);
 	serial_puts("SCORE: ");
-	vt100_move(13, 2);
-	serial_puts("000");
+	vt100_move(10, 2);
+	serial_puts("0");
 	vt100_move(70, 2);
 	serial_puts("VIES: ");
 	vt100_move(75, 2);
@@ -88,7 +88,7 @@ void refresh_screen(void)
 void select_difficulty(void)
 {
 	vt100_clear_screen();
-	while (inp_clav != 13) /*32 ASCII de l'espace*/
+	while (inp_clav != 13) /*13 ASCII de entrer*/
 	{
 		inp_clav = serial_get_last_char();
 
