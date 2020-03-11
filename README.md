@@ -6,7 +6,7 @@
 
   <h3>Réalistaion du jeu Space Invaders en C pour une STM32F4 Discovery</h3>
 
-  <img source="ynov.png" width="197" height="124"/
+  <img source="ynov.png" width="197" height="124">
 
   <img source="test.gif">
 
