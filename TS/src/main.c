@@ -85,8 +85,6 @@ int main(void)
 		bombs[nbomb].yb = ptralien[random].ya;
 	}
 	extern char mode;
-	//vt100_move(23, 20);
-	//serial_putchar(mode);
 
 	/*Partie en cours*/
 	while (statut_game == 1)
@@ -96,7 +94,6 @@ int main(void)
 		j++;
 
 		sprintf(display_score, "%d", score);
-
 
 		if (mode ==49)
 		{
@@ -241,7 +238,6 @@ int main(void)
 					bombs[nbomb].yb = ptralien[random].ya;
 				}
 				j = 0;
-
 			}
 		}
 

@@ -20,8 +20,8 @@ void menu_init(uint8_t vie)
 	serial_puts("-> Play <-");
 	vt100_move(29, 17);
 	serial_puts("   Select difficulty   ");
-	vt100_move(30, 20);
-	serial_puts("Press <SPACE> to start");
+	vt100_move(27, 20);
+	serial_puts("Press <SPACE> to select menu");
 
 	while (inp_clav != 32) /*32 ASCII de l'espace*/
 	{
@@ -71,7 +71,7 @@ void refresh_screen(void)
 		if (selection == 0)
 		{
 			vt100_move(35, 14);
-			serial_puts("-> Play <-");
+		serial_puts("=> Play <=");
 			vt100_move(29, 17);
 			serial_puts("   Select difficulty   ");
 		}
@@ -80,7 +80,7 @@ void refresh_screen(void)
 			vt100_move(35, 14);
 			serial_puts("   Play   ");
 			vt100_move(29, 17);
-			serial_puts("-> Select difficulty <-");
+		serial_puts("=> Select difficulty <=");
 		}
 	}
 
@@ -101,7 +101,7 @@ void select_difficulty(void)
 		serial_puts(" 2  Medium   ");
 		vt100_move(35, 16);
 		serial_puts(" 3  Hard   ");
-		vt100_move(35, 20);
+		vt100_move(30, 20);
 		serial_puts(" Press Enter to play   ");
 
 
