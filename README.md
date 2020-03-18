@@ -6,4 +6,4 @@ Réalistaion du jeu Space Invaders en C pour une STM32F4 Discovery
 
 ![](ynov.png)
 
-![](test.gif)
+![](game.gif)
