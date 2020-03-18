@@ -34,7 +34,7 @@ int main(void)
 
 	char b = 51;
 	uint8_t vie = b;
-	uint8_t score = 0;
+	uint8_t score = 1;
 	uint8_t statut_game = 1; //1 = en cours, 0 = perdu, 2 = gagné
 	uint8_t inp_clav;
 	uint8_t xv = 40;
